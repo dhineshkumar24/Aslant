@@ -2,6 +2,8 @@ export const CONFIG = {
   WIDTH: 480,
   HEIGHT: 854,
   PLAYER_MARGIN: 24,
+  /** Per-frame follow rate at 60fps; converted to delta-independent lerp in PlayScene. */
+  PLAYER_LERP: 0.18,
   PLAYER_SPEED: 520,
   HAZARD_MIN_SPEED: 180,
   HAZARD_MAX_SPEED: 340,

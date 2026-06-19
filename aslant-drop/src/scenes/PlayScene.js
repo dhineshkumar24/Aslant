@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { CONFIG } from '../config.js';
+import { getGameSafeAreaInsets, lerpFactor } from '../safeArea.js';
 
 export class PlayScene extends Phaser.Scene {
   constructor() {
@@ -20,6 +21,8 @@ export class PlayScene extends Phaser.Scene {
 
     this.spawnAtmosphere();
     this.addVignette();
+
+    this.safeArea = getGameSafeAreaInsets(this);
 
     this.player = this.add.container(WIDTH / 2, HEIGHT / 2);
     const glow = this.add.circle(0, 0, 26, PALETTE.playerGlow, 0.18);
@@ -77,7 +80,7 @@ export class PlayScene extends Phaser.Scene {
     });
 
     this.scoreText = this.add
-      .text(WIDTH / 2, 60, '0', {
+      .text(WIDTH / 2, 60 + this.safeArea.top, '0', {
         fontFamily: 'Georgia, serif',
         fontSize: '40px',
         color: PALETTE.text,
@@ -277,21 +280,23 @@ export class PlayScene extends Phaser.Scene {
     shard.body.setCollideWorldBounds(false);
   }
 
-  update() {
+  update(_time, delta) {
     if (!this.isAlive) return;
 
     const margin = CONFIG.PLAYER_MARGIN;
+    const { top, bottom, left, right } = this.safeArea;
+    const t = lerpFactor(delta);
     const dx = this.targetX - this.player.x;
     const dy = this.targetY - this.player.y;
     this.player.x = Phaser.Math.Clamp(
-      this.player.x + dx * 0.18,
-      margin,
-      CONFIG.WIDTH - margin,
+      this.player.x + dx * t,
+      margin + left,
+      CONFIG.WIDTH - margin - right,
     );
     this.player.y = Phaser.Math.Clamp(
-      this.player.y + dy * 0.18,
-      margin,
-      CONFIG.HEIGHT - margin,
+      this.player.y + dy * t,
+      margin + top,
+      CONFIG.HEIGHT - margin - bottom,
     );
 
     this.hazards.getChildren().forEach((h) => {

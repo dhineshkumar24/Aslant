@@ -4,8 +4,9 @@ import { CONFIG } from './config.js';
 import { MenuScene } from './scenes/MenuScene.js';
 import { PlayScene } from './scenes/PlayScene.js';
 import { GameOverScene } from './scenes/GameOverScene.js';
+import { loadBestScore } from './storage.js';
 
-new Phaser.Game({
+const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game-root',
   width: CONFIG.WIDTH,
@@ -21,3 +22,5 @@ new Phaser.Game({
   },
   scene: [MenuScene, PlayScene, GameOverScene],
 });
+
+game.registry.set('best', loadBestScore());

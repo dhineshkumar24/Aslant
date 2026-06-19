@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { CONFIG } from '../config.js';
+import { getGameSafeAreaInsets } from '../safeArea.js';
+import { updateBestScore } from '../storage.js';
 
 export class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -12,13 +14,12 @@ export class GameOverScene extends Phaser.Scene {
 
   create() {
     const { WIDTH, HEIGHT } = CONFIG;
+    const safe = getGameSafeAreaInsets(this);
     this.cameras.main.setBackgroundColor(CONFIG.PALETTE.bg);
     this.cameras.main.fadeIn(400, 0, 0, 0);
 
-    if (!this.registry.get('best') || this.finalScore > this.registry.get('best')) {
-      this.registry.set('best', this.finalScore);
-    }
-    const best = this.registry.get('best');
+    const best = updateBestScore(this.finalScore);
+    this.registry.set('best', best);
 
     this.add
       .text(WIDTH / 2, HEIGHT * 0.36, 'lost to the dark', {
@@ -45,7 +46,7 @@ export class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const again = this.add
-      .text(WIDTH / 2, HEIGHT * 0.68, 'tap to descend again', {
+      .text(WIDTH / 2, HEIGHT * 0.68 - safe.bottom * 0.5, 'tap to descend again', {
         fontFamily: '-apple-system, sans-serif',
         fontSize: '18px',
         color: '#d8d6e0',
