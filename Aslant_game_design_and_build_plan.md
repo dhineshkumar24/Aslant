@@ -1,4 +1,4 @@
-# UMBRA — Game Design Doc & First-Build Plan
+# Aslant — Game Design Doc & First-Build Plan
 
 *A dark-themed illusion puzzler for iOS. Monument Valley's mechanic, INSIDE's mood.*
 
@@ -82,7 +82,7 @@ Ship these 5 before adding anything. A polished 5-level slice beats a janky 20-l
 
 | Layer | Choice | Why |
 |---|---|---|
-| **Engine** | **Unity (LTS version), C#** | The right tool for 3D illusion geometry. Huge tutorial base, asset store, handles the isometric 3D pipeline you'd fight in SwiftUI. |
+| **Engine** | **Unity 6.3 LTS (6000.3.x), C#** | The right tool for 3D illusion geometry. Huge tutorial base, asset store, handles the isometric 3D pipeline you'd fight in SwiftUI. |
 | **Editor** | **Cursor** | Writes and explains C# well. You'll edit scripts in Cursor, design scenes in the Unity editor. |
 | **Target** | iOS (build via Xcode at the end) | Unity exports an Xcode project; you only touch Xcode to build/sign. |
 | **Source control** | Git + GitHub | Commit after every working step. Non-negotiable for a beginner — it's your undo button. |
@@ -97,7 +97,7 @@ Ship these 5 before adding anything. A polished 5-level slice beats a janky 20-l
 Each phase ends with something *running*. Do not start a phase until the previous one works and is committed to Git.
 
 ### Phase 0 — Environment (½ day)
-1. Install **Unity Hub** + latest **Unity LTS**, with iOS Build Support module.
+1. Install **Unity Hub** + **Unity 6.3 LTS** (`6000.3.x`), with iOS Build Support module.
 2. Install **Cursor**. Open your Unity project folder in Cursor.
 3. Install **Git**, create a GitHub repo, add Unity's standard `.gitignore`.
 4. Create an empty 3D project. Make one cube. Press Play. Commit.
@@ -112,7 +112,7 @@ Each phase ends with something *running*. Do not start a phase until the previou
 ### Phase 2 — Walk (3–5 days)
 1. Make tiles into walkable nodes (a simple graph: each tile knows its neighbors).
 2. On tap, find the tapped tile, compute a path, move the figure tile-to-tile.
-3. Use Unity's NavMesh **or** a simple hand-rolled grid pathfinder (ask Cursor to generate A* on a grid — good learning moment).
+3. Use a hand-rolled grid pathfinder (ask Cursor to generate A* on a grid — good learning moment). Avoid NavMesh; walkable topology changes when structures rotate.
    - **Success check:** tap anywhere reachable, figure walks there smoothly. **This is Level 1.**
 
 ### Phase 3 — Rotate & The Illusion (5–7 days)
@@ -168,8 +168,7 @@ Ship that. Then we design the multiplayer follow-up on a foundation you actually
 ## 11. Open Questions to Resolve Before Phase 4
 
 1. **Figure design** — abstract shape, silhouette, or simple character? (Affects art effort.)
-2. **Title** — "UMBRA" is a placeholder (Latin for *shadow*). Keep or replace?
-3. **One stretch mechanic** — if Walk + Rotate go well, do you want Slide or Perspective-lock next?
+2. **One stretch mechanic** — if Walk + Rotate go well, do you want Slide or Perspective-lock next?
 
 ---
 
