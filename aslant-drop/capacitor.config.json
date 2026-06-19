@@ -1,0 +1,10 @@
+{
+  "appId": "com.dhineshkumar.aslantdrop",
+  "appName": "ASLANT Drop",
+  "webDir": "dist",
+  "backgroundColor": "#0a0a0f",
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#0a0a0f"
+  }
+}
