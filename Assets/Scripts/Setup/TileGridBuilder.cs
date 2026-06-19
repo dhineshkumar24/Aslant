@@ -1,3 +1,4 @@
+using Aslant.Grid;
 using UnityEngine;
 
 namespace Aslant.Setup
@@ -17,15 +18,30 @@ namespace Aslant.Setup
 
         Material tileMaterial;
         Material edgeMaterial;
+        GridTile[,] tiles;
+
+        public int Width => width;
+        public int Depth => depth;
+        public float TileSize => tileSize;
+        public float TileHeight => tileHeight;
 
         void OnEnable()
         {
+            if (Application.isPlaying && transform.childCount > 0)
+            {
+                CacheTilesFromChildren();
+                return;
+            }
+
             Rebuild();
         }
 
         void OnValidate()
         {
-            Rebuild();
+            if (!Application.isPlaying)
+            {
+                Rebuild();
+            }
         }
 
         [ContextMenu("Rebuild Grid")]
@@ -33,6 +49,7 @@ namespace Aslant.Setup
         {
             EnsureMaterials();
             ClearGeneratedTiles();
+            tiles = new GridTile[width, depth];
 
             var offsetX = (width - 1) * tileSize * 0.5f;
             var offsetZ = (depth - 1) * tileSize * 0.5f;
@@ -44,6 +61,56 @@ namespace Aslant.Setup
                     CreateTile(x, z, offsetX, offsetZ);
                 }
             }
+        }
+
+        public bool IsWalkable(Vector2Int cell)
+        {
+            return IsInsideGrid(cell.x, cell.y) && tiles[cell.x, cell.y] != null;
+        }
+
+        public Vector3 GetTileCenter(int x, int z)
+        {
+            var offsetX = (width - 1) * tileSize * 0.5f;
+            var offsetZ = (depth - 1) * tileSize * 0.5f;
+            return transform.TransformPoint(new Vector3(
+                x * tileSize - offsetX,
+                tileHeight,
+                z * tileSize - offsetZ));
+        }
+
+        public Vector3 GetWorldPositionForFigure(Vector2Int cell)
+        {
+            return GetTileCenter(cell.x, cell.y);
+        }
+
+        public bool TryGetCellFromWorld(Vector3 worldPosition, out Vector2Int cell)
+        {
+            var local = transform.InverseTransformPoint(worldPosition);
+            var offsetX = (width - 1) * tileSize * 0.5f;
+            var offsetZ = (depth - 1) * tileSize * 0.5f;
+
+            var x = Mathf.RoundToInt((local.x + offsetX) / tileSize);
+            var z = Mathf.RoundToInt((local.z + offsetZ) / tileSize);
+            cell = new Vector2Int(x, z);
+            return IsInsideGrid(x, z);
+        }
+
+        void CacheTilesFromChildren()
+        {
+            tiles = new GridTile[width, depth];
+            foreach (Transform child in transform)
+            {
+                var tile = child.GetComponent<GridTile>();
+                if (tile != null && IsInsideGrid(tile.GridX, tile.GridZ))
+                {
+                    tiles[tile.GridX, tile.GridZ] = tile;
+                }
+            }
+        }
+
+        bool IsInsideGrid(int x, int z)
+        {
+            return x >= 0 && x < width && z >= 0 && z < depth;
         }
 
         void EnsureMaterials()
@@ -109,10 +176,17 @@ namespace Aslant.Setup
             tile.transform.localScale = new Vector3(tileSize * 0.96f, tileHeight, tileSize * 0.96f);
             tile.GetComponent<Renderer>().sharedMaterial = tileMaterial;
 
-            var collider = tile.GetComponent<Collider>();
-            if (collider != null && !Application.isPlaying)
+            var gridTile = tile.AddComponent<GridTile>();
+            gridTile.Initialize(x, z);
+            tiles[x, z] = gridTile;
+
+            if (!Application.isPlaying)
             {
-                DestroyImmediate(collider);
+                var collider = tile.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    DestroyImmediate(collider);
+                }
             }
         }
     }

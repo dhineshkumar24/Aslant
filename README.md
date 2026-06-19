@@ -4,7 +4,7 @@ A dark-themed illusion puzzler for iOS. **Monument Valley's mechanic, INSIDE's m
 
 > You guide a small, lantern-lit figure through impossible architecture in a world of shadow — rotating and shifting structures so that paths which *look* connected actually become connected, escaping deeper into a silent, unsettling place.
 
-**Status:** Phase 1 in progress — isometric camera, tile floor, and placeholder figure  
+**Status:** Phase 2 in progress — tap-to-move with grid A* pathfinding  
 **Engine:** Unity 6.3 LTS (`6000.3.x`)  
 **Repository:** [github.com/dhineshkumar24/Aslant](https://github.com/dhineshkumar24/Aslant) (private)  
 **Default branch:** `master`
@@ -94,7 +94,8 @@ Each phase ends with something running. Do not start a phase until the previous 
 | Phase | Focus | Est. time |
 |---|---|---|
 | **0** | Environment — Unity Hub, LTS + iOS module, Git, empty 3D project | ✅ Done |
-| **1** | Isometric look — orthographic camera, tile floor, placeholder figure | In progress |
+| **1** | Isometric look — orthographic camera, tile floor, placeholder figure | ✅ Done |
+| **2** | Walk — grid graph, tap-to-move, A* pathfinding | In progress |
 | **2** | Walk — grid graph, tap-to-move, A* pathfinding | 3–5 days |
 | **3** | Rotate & illusion — 90° snap rotation, screen-space graph connection | 5–7 days |
 | **4** | Five levels + fade transitions | 1–2 weeks |
@@ -181,6 +182,13 @@ Resolve before Phase 4 (level building):
 │   └── Scripts/
 │       ├── Camera/
 │       │   └── FixedIsometricCamera.cs
+│       ├── Gameplay/
+│       │   ├── FigureWalker.cs
+│       │   └── WalkInputController.cs
+│       ├── Grid/
+│       │   └── GridTile.cs
+│       ├── Pathfinding/
+│       │   └── GridPathfinder.cs
 │       └── Setup/
 │           ├── TileGridBuilder.cs
 │           ├── FigurePlaceholder.cs
@@ -192,13 +200,13 @@ Resolve before Phase 4 (level building):
 
 ---
 
-## Phase 1 — Verify on your Mac
+## Phase 2 — Verify walk on your Mac
 
-1. Pull the latest branch and open the project in Unity Hub.
-2. Open `Assets/Scenes/Main.unity`.
-3. You should see a **6×6 tile floor**, a **capsule figure** with a warm **lantern light**, and two **offset platforms** (illusion hint).
-4. Press **Play** — the orthographic isometric camera stays locked at 30° / 45°.
-5. **Success check:** the scene reads as flat/isometric; the two hint platforms should look like they might connect from this angle.
+1. Pull branch `cursor/phase2-walk-c43c` (or latest `master` after merge).
+2. Open `Assets/Scenes/Main.unity` in Unity and press **Play**.
+3. **Click** a tile (Unity Editor) or **tap** a tile (iOS device build).
+4. The figure should pathfind across the grid and walk tile-to-tile to the destination.
+5. **Success check:** tap any reachable tile — figure walks smoothly along the grid. This is Level 1 gameplay.
 
 ---
 

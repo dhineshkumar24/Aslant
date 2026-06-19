@@ -8,7 +8,6 @@ namespace Aslant.Setup
     {
         const string FigureChildName = "FigureMesh";
 
-        [SerializeField] Vector3 startTile = new(-2f, 0f, -2f);
         [SerializeField] float capsuleHeight = 1.2f;
         [SerializeField] float capsuleRadius = 0.25f;
         [SerializeField] Color bodyColor = new(0.12f, 0.12f, 0.14f, 1f);
@@ -19,14 +18,24 @@ namespace Aslant.Setup
         GameObject figureMesh;
         Light lanternLight;
 
+        public float CapsuleHeight => capsuleHeight;
+
         void OnEnable()
         {
+            if (Application.isPlaying && figureMesh != null)
+            {
+                return;
+            }
+
             Rebuild();
         }
 
         void OnValidate()
         {
-            Rebuild();
+            if (!Application.isPlaying)
+            {
+                Rebuild();
+            }
         }
 
         [ContextMenu("Rebuild Figure")]
@@ -38,14 +47,21 @@ namespace Aslant.Setup
             figureMesh = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             figureMesh.name = FigureChildName;
             figureMesh.transform.SetParent(transform, false);
-            figureMesh.transform.localPosition = new Vector3(startTile.x, capsuleHeight * 0.5f, startTile.z);
+            figureMesh.transform.localPosition = new Vector3(0f, capsuleHeight * 0.5f, 0f);
             figureMesh.transform.localScale = new Vector3(capsuleRadius * 2f, capsuleHeight * 0.5f, capsuleRadius * 2f);
             figureMesh.GetComponent<Renderer>().sharedMaterial = bodyMaterial;
 
             var collider = figureMesh.GetComponent<Collider>();
-            if (collider != null && !Application.isPlaying)
+            if (collider != null)
             {
-                DestroyImmediate(collider);
+                if (Application.isPlaying)
+                {
+                    Destroy(collider);
+                }
+                else
+                {
+                    DestroyImmediate(collider);
+                }
             }
 
             var lantern = new GameObject("LanternLight");
