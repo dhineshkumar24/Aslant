@@ -62,9 +62,15 @@ A small game built to be finished and enjoyed. How long can you hold the light?
 avoider,arcade,survival,one tap,dark,atmospheric,indie,casual,score,endless
 ```
 
-**Support URL**: your email or a simple site (e.g. GitHub repo or personal page)
+**Support URL**:
+```
+https://dhineshkumar24.github.io/Aslant/support.html
+```
 
-**Privacy Policy URL**: host `docs/privacy-policy.html` (see Step 2) on GitHub Pages, Vercel, or any public URL
+**Privacy Policy URL**:
+```
+https://dhineshkumar24.github.io/Aslant/privacy-policy.html
+```
 
 **Copyright**: `© 2026 Dhineshkumar Murugesan`
 
@@ -135,6 +141,56 @@ Optional: Xcode Simulator → **File → New Screen Shot** for exact pixel sizes
 
 Tip: use **Window → Organizer** in Xcode or the iOS screenshot shortcut. You need at least 3 screenshots; 5 is better.
 
+## Fix “Unable to Add for Review” blockers
+
+If App Store Connect shows these errors, fix them in order:
+
+### 1. Support URL (on this page)
+
+Under **App Information** or the version page → **English (U.S.)**:
+
+| Field | Value |
+|---|---|
+| Support URL | `https://dhineshkumar24.github.io/Aslant/support.html` |
+| Privacy Policy URL | `https://dhineshkumar24.github.io/Aslant/privacy-policy.html` |
+
+Push `docs/support.html` to GitHub if not live yet:
+
+```bash
+cd /path/to/Aslant
+git add docs/support.html docs/privacy-policy.html
+git commit -m "docs: add support page for App Store"
+git push origin master
+```
+
+### 2. Primary category
+
+**App Store Connect** → **ASLANT Drop** → left sidebar **App Information** → **Category**:
+
+- **Primary:** Games → **Arcade**
+- **Secondary (optional):** Games → **Casual**
+
+Click **Save**.
+
+### 3. Price tier
+
+Left sidebar → **Pricing and Availability**:
+
+- **Price:** **Free** (or $0.00)
+- **Availability:** all countries (or your choice)
+
+Click **Save**.
+
+### 4. Choose a build (requires Xcode upload)
+
+You must upload a build before **Add for Review** works:
+
+1. `cd aslant-drop && npm run cap:sync:ios && npm run cap:ios`
+2. Xcode → destination **Any iOS Device (arm64)**
+3. **Product → Archive** → **Distribute App** → **App Store Connect** → **Upload**
+4. Wait 5–30 minutes for processing
+5. Return to **1.0 Prepare for Submission** → **Build** section → **+** → select build **1**
+
 ## Step 4 — Build and upload from Xcode
 
 From the project root:
@@ -162,6 +218,10 @@ In Xcode:
    - Export compliance: **No** for proprietary encryption (already set in Info.plist)
 
 5. Wait for processing in App Store Connect (usually 5–30 minutes)
+
+### iPad upload error (code 90474)
+
+If upload fails with *"need to include all orientations to support iPad multitasking"*, the app has `UIRequiresFullScreen` set to `true` in `Info.plist`. This opts out of Split View/Slide Over and allows portrait-only on iPad. Re-archive with an incremented **Build** number and upload again.
 
 ### For each new upload
 
