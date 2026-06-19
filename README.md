@@ -1,14 +1,15 @@
-# Aslant — UMBRA
+# Aslant
 
 A dark-themed illusion puzzler for iOS. **Monument Valley's mechanic, INSIDE's mood.**
 
 > You guide a small, lantern-lit figure through impossible architecture in a world of shadow — rotating and shifting structures so that paths which *look* connected actually become connected, escaping deeper into a silent, unsettling place.
 
-**Status:** Pre-production (design doc complete, Unity project not yet started)  
+**Status:** Phase 0 in progress — Unity project scaffolded; open in Unity Hub to verify Play mode  
+**Engine:** Unity 6.3 LTS (`6000.3.x`)  
 **Repository:** [github.com/dhineshkumar24/Aslant](https://github.com/dhineshkumar24/Aslant) (private)  
 **Default branch:** `master`
 
-For the full design document and step-by-step build plan, see [`UMBRA_game_design_and_build_plan.md`](./UMBRA_game_design_and_build_plan.md).
+For the full design document and step-by-step build plan, see [`Aslant_game_design_and_build_plan.md`](./Aslant_game_design_and_build_plan.md).
 
 ---
 
@@ -76,7 +77,7 @@ Five hand-authored levels. Ship these before adding anything else.
 
 | Layer | Choice |
 |---|---|
-| Engine | Unity (LTS), C# |
+| Engine | Unity 6.3 LTS (`6000.3.x`), C# |
 | Editor | Cursor (scripts) + Unity Editor (scenes) |
 | Target | iOS via Xcode build/sign |
 | Source control | Git + GitHub |
@@ -153,8 +154,7 @@ No death state, but players may rotate into dead ends. Consider a no-UI undo (e.
 Resolve before Phase 4 (level building):
 
 1. **Figure design** — Abstract silhouette + lantern (recommended: hooded shape or simple blockout; no rig cost)
-2. **Title** — "UMBRA" (Latin for *shadow*) is a placeholder; strong candidate to keep
-3. **Stretch mechanic** — Slide recommended over Perspective-lock (more teachable without words)
+2. **Stretch mechanic** — Slide recommended over Perspective-lock (more teachable without words)
 
 ---
 
@@ -172,11 +172,27 @@ Resolve before Phase 4 (level building):
 
 ```
 .
-├── README.md                          # This file — project overview
-└── UMBRA_game_design_and_build_plan.md  # Full design doc & build plan
+├── README.md
+├── Aslant_game_design_and_build_plan.md
+├── .gitignore
+├── Assets/
+│   └── Scenes/
+│       └── Main.unity          # Phase 0 scene — camera, light, cube
+├── Packages/
+│   └── manifest.json
+└── ProjectSettings/
 ```
 
-Unity project files will be added starting at Phase 0.
+---
+
+## Phase 0 — Local Setup
+
+Complete these steps on your machine (Unity + iOS builds require macOS for device deploy):
+
+1. Install [Unity Hub](https://unity.com/download) and add **Unity 6.3 LTS** (`6000.3.x`) with **iOS Build Support**.
+2. Clone this repo and open the project folder in Unity Hub (**Add → Add project from disk**).
+3. Open `Assets/Scenes/Main.unity`, press **Play** — you should see a cube in the default 3D scene.
+4. Open the same folder in Cursor for script editing.
 
 ---
 
