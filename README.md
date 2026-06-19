@@ -4,7 +4,7 @@ A dark-themed illusion puzzler for iOS. **Monument Valley's mechanic, INSIDE's m
 
 > You guide a small, lantern-lit figure through impossible architecture in a world of shadow — rotating and shifting structures so that paths which *look* connected actually become connected, escaping deeper into a silent, unsettling place.
 
-**Status:** Phase 0 in progress — Unity project scaffolded; open in Unity Hub to verify Play mode  
+**Status:** Phase 1 in progress — isometric camera, tile floor, and placeholder figure  
 **Engine:** Unity 6.3 LTS (`6000.3.x`)  
 **Repository:** [github.com/dhineshkumar24/Aslant](https://github.com/dhineshkumar24/Aslant) (private)  
 **Default branch:** `master`
@@ -93,8 +93,8 @@ Each phase ends with something running. Do not start a phase until the previous 
 
 | Phase | Focus | Est. time |
 |---|---|---|
-| **0** | Environment — Unity Hub, LTS + iOS module, Git, empty 3D project | ½ day |
-| **1** | Isometric look — orthographic camera, tile floor, placeholder figure | 1–2 days |
+| **0** | Environment — Unity Hub, LTS + iOS module, Git, empty 3D project | ✅ Done |
+| **1** | Isometric look — orthographic camera, tile floor, placeholder figure | In progress |
 | **2** | Walk — grid graph, tap-to-move, A* pathfinding | 3–5 days |
 | **3** | Rotate & illusion — 90° snap rotation, screen-space graph connection | 5–7 days |
 | **4** | Five levels + fade transitions | 1–2 weeks |
@@ -176,8 +176,15 @@ Resolve before Phase 4 (level building):
 ├── Aslant_game_design_and_build_plan.md
 ├── .gitignore
 ├── Assets/
-│   └── Scenes/
-│       └── Main.unity          # Phase 0 scene — camera, light, cube
+│   ├── Scenes/
+│   │   └── Main.unity              # Main scene
+│   └── Scripts/
+│       ├── Camera/
+│       │   └── FixedIsometricCamera.cs
+│       └── Setup/
+│           ├── TileGridBuilder.cs
+│           ├── FigurePlaceholder.cs
+│           └── IllusionHintBuilder.cs
 ├── Packages/
 │   └── manifest.json
 └── ProjectSettings/
@@ -185,14 +192,13 @@ Resolve before Phase 4 (level building):
 
 ---
 
-## Phase 0 — Local Setup
+## Phase 1 — Verify on your Mac
 
-Complete these steps on your machine (Unity + iOS builds require macOS for device deploy):
-
-1. Install [Unity Hub](https://unity.com/download) and add **Unity 6.3 LTS** (`6000.3.x`) with **iOS Build Support**.
-2. Clone this repo and open the project folder in Unity Hub (**Add → Add project from disk**).
-3. Open `Assets/Scenes/Main.unity`, press **Play** — you should see a cube in the default 3D scene.
-4. Open the same folder in Cursor for script editing.
+1. Pull the latest branch and open the project in Unity Hub.
+2. Open `Assets/Scenes/Main.unity`.
+3. You should see a **6×6 tile floor**, a **capsule figure** with a warm **lantern light**, and two **offset platforms** (illusion hint).
+4. Press **Play** — the orthographic isometric camera stays locked at 30° / 45°.
+5. **Success check:** the scene reads as flat/isometric; the two hint platforms should look like they might connect from this angle.
 
 ---
 
