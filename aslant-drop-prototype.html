@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ASLANT — Drop</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0a0a0f;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  #game-root {
+    width: 100vw;
+    height: 100vh;
+    max-width: 480px;
+    max-height: 900px;
+  }
+  canvas { display: block; touch-action: none; }
+</style>
+</head>
+<body>
+<div id="game-root"></div>
+<script>
+/* ============================================================
+   ASLANT — Drop  (one-tap avoider, dark/moody first prototype)
+   Single-file prototype. This mirrors what your Cursor project
+   will contain in src/scenes/*.js — kept in one file here so you
+   can open it in a browser and PLAY immediately, no build step.
+   ============================================================ */
+
+// ---- Tunable game constants (tweak these to change feel) ----
+const CONFIG = {
+  WIDTH: 480,
+  HEIGHT: 854,
+  PLAYER_SPEED: 520,      // how fast the figure tracks your finger/cursor
+  HAZARD_MIN_SPEED: 180,  // slowest falling shard
+  HAZARD_MAX_SPEED: 340,  // fastest falling shard
+  SPAWN_START_MS: 900,    // time between spawns at the start
+  SPAWN_MIN_MS: 320,      // fastest spawn rate (difficulty ceiling)
+  RAMP_EVERY_MS: 4000,    // how often difficulty steps up
+  PALETTE: {
+    bg: 0x0a0a0f,
+    fog: 0x12121c,
+    player: 0xff9d3c,     // the one warm light — the figure's lantern
+    playerGlow: 0xffb968,
+    hazard: 0x2e2e3e,     // cold, near-invisible shards
+    hazardEdge: 0x4a4a63,
+    text: '#d8d6e0'
+  }
+};
+
+/* ---------------- Boot / Menu Scene ---------------- */
+class MenuScene extends Phaser.Scene {
+  constructor() { super('Menu'); }
+
+  create() {
+    const { WIDTH, HEIGHT, PALETTE } = CONFIG;
+    this.cameras.main.setBackgroundColor(PALETTE.bg);
+
+    // Ambient drifting fog specks for atmosphere
+    this.spawnAmbient();
+
+    const title = this.add.text(WIDTH / 2, HEIGHT * 0.38, 'ASLANT', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '64px',
+      color: '#ff9d3c',
+      letterSpacing: 12
+    }).setOrigin(0.5);
+    title.setAlpha(0);
+
+    const sub = this.add.text(WIDTH / 2, HEIGHT * 0.46, 'drop', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '22px',
+      color: '#6a6a82',
+      letterSpacing: 8
+    }).setOrigin(0.5);
+    sub.setAlpha(0);
+
+    const prompt = this.add.text(WIDTH / 2, HEIGHT * 0.62,
+      'tap and hold to move\navoid what falls', {
+      fontFamily: '-apple-system, sans-serif',
+      fontSize: '17px',
+      color: '#8a8aa0',
+      align: 'center',
+      lineSpacing: 8
+    }).setOrigin(0.5);
+    prompt.setAlpha(0);
+
+    // Gentle fade-ins — restraint over flash
+    this.tweens.add({ targets: title, alpha: 1, duration: 1400, ease: 'Sine.out' });
+    this.tweens.add({ targets: sub, alpha: 1, duration: 1400, delay: 400, ease: 'Sine.out' });
+    this.tweens.add({ targets: prompt, alpha: 0.9, duration: 1200, delay: 1000,
+      yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+
+    this.input.once('pointerdown', () => {
+      this.cameras.main.fadeOut(500, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Play'));
+    });
+  }
+
+  spawnAmbient() {
+    const { WIDTH, HEIGHT, PALETTE } = CONFIG;
+    for (let i = 0; i < 30; i++) {
+      const x = Phaser.Math.Between(0, WIDTH);
+      const y = Phaser.Math.Between(0, HEIGHT);
+      const dot = this.add.circle(x, y, Phaser.Math.Between(1, 2), PALETTE.hazardEdge, 0.4);
+      this.tweens.add({
+        targets: dot,
+        y: y - Phaser.Math.Between(40, 120),
+        alpha: 0,
+        duration: Phaser.Math.Between(4000, 9000),
+        repeat: -1,
+        delay: Phaser.Math.Between(0, 4000)
+      });
+    }
+  }
+}
+
+/* ---------------- Play Scene ---------------- */
+class PlayScene extends Phaser.Scene {
+  constructor() { super('Play'); }
+
+  create() {
+    const { WIDTH, HEIGHT, PALETTE } = CONFIG;
+    this.cameras.main.setBackgroundColor(PALETTE.bg);
+    this.cameras.main.fadeIn(500, 0, 0, 0);
+
+    this.isAlive = true;
+    this.score = 0;
+    this.spawnDelay = CONFIG.SPAWN_START_MS;
+
+    // --- Player: a glowing figure (the lantern) ---
+    this.player = this.add.container(WIDTH / 2, HEIGHT * 0.82);
+    const glow = this.add.circle(0, 0, 26, PALETTE.playerGlow, 0.18);
+    const glow2 = this.add.circle(0, 0, 16, PALETTE.playerGlow, 0.28);
+    const core = this.add.circle(0, 0, 9, PALETTE.player, 1);
+    this.player.add([glow, glow2, core]);
+    this.physics.world.enable(this.player);
+    this.player.body.setCircle(9, -9, -9);
+    this.player.body.setCollideWorldBounds(true);
+
+    // Soft pulsing glow
+    this.tweens.add({ targets: [glow, glow2], scale: 1.25, alpha: '+=0.06',
+      duration: 1100, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+
+    // --- Input: track pointer horizontally (and a little vertically) ---
+    this.targetX = this.player.x;
+    this.targetY = this.player.y;
+    this.pointerDown = false;
+
+    this.input.on('pointerdown', (p) => { this.pointerDown = true; this.targetX = p.x; this.targetY = p.y; });
+    this.input.on('pointermove', (p) => { if (this.pointerDown || p.isDown) { this.targetX = p.x; this.targetY = p.y; } });
+    this.input.on('pointerup', () => { this.pointerDown = false; });
+
+    // --- Hazards group ---
+    this.hazards = this.physics.add.group();
+    this.physics.add.overlap(this.player, this.hazards, this.hitHazard, null, this);
+
+    // --- Spawning loop ---
+    this.spawnTimer = this.time.addEvent({
+      delay: this.spawnDelay, callback: this.spawnHazard, callbackScope: this, loop: true
+    });
+
+    // --- Difficulty ramp ---
+    this.time.addEvent({
+      delay: CONFIG.RAMP_EVERY_MS, loop: true, callback: () => {
+        this.spawnDelay = Math.max(CONFIG.SPAWN_MIN_MS, this.spawnDelay - 70);
+        this.spawnTimer.reset({ delay: this.spawnDelay, callback: this.spawnHazard,
+          callbackScope: this, loop: true });
+      }
+    });
+
+    // --- Score (survival time) ---
+    this.scoreText = this.add.text(WIDTH / 2, 60, '0', {
+      fontFamily: 'Georgia, serif', fontSize: '40px', color: PALETTE.text
+    }).setOrigin(0.5).setAlpha(0.85);
+
+    this.scoreTimer = this.time.addEvent({
+      delay: 100, loop: true, callback: () => {
+        if (!this.isAlive) return;
+        this.score += 1;
+        this.scoreText.setText(Math.floor(this.score / 10).toString());
+      }
+    });
+  }
+
+  spawnHazard() {
+    if (!this.isAlive) return;
+    const { WIDTH, PALETTE } = CONFIG;
+    const x = Phaser.Math.Between(20, WIDTH - 20);
+    const size = Phaser.Math.Between(10, 26);
+
+    // A cold angular shard — drawn as a rotated rectangle
+    const shard = this.add.rectangle(x, -30, size, size, PALETTE.hazard);
+    shard.setStrokeStyle(1, PALETTE.hazardEdge);
+    shard.setAngle(Phaser.Math.Between(0, 90));
+    this.hazards.add(shard);
+
+    const speed = Phaser.Math.Between(CONFIG.HAZARD_MIN_SPEED, CONFIG.HAZARD_MAX_SPEED);
+    shard.body.setVelocityY(speed);
+    shard.body.setAngularVelocity(Phaser.Math.Between(-60, 60));
+
+    // Clean up off-screen shards
+    shard.body.setCollideWorldBounds(false);
+  }
+
+  update() {
+    if (!this.isAlive) return;
+
+    // Smoothly move player toward pointer target
+    const dx = this.targetX - this.player.x;
+    const dy = (this.targetY - this.player.y) * 0.4; // vertical is dampened
+    this.player.x += dx * 0.18;
+    this.player.y = Phaser.Math.Clamp(this.player.y + dy * 0.18,
+      CONFIG.HEIGHT * 0.5, CONFIG.HEIGHT - 30);
+
+    // Remove shards that left the screen (memory hygiene)
+    this.hazards.getChildren().forEach((h) => {
+      if (h.y > CONFIG.HEIGHT + 40) h.destroy();
+    });
+  }
+
+  hitHazard() {
+    if (!this.isAlive) return;
+    this.isAlive = false;
+
+    // Impact feel: flash + shake, then fade to game over
+    this.cameras.main.flash(200, 255, 157, 60);
+    this.cameras.main.shake(250, 0.012);
+    this.spawnTimer.remove();
+    this.scoreTimer.remove();
+
+    this.tweens.add({ targets: this.player, alpha: 0, scale: 2, duration: 400 });
+
+    this.time.delayedCall(700, () => {
+      this.scene.start('GameOver', { score: Math.floor(this.score / 10) });
+    });
+  }
+}
+
+/* ---------------- Game Over Scene ---------------- */
+class GameOverScene extends Phaser.Scene {
+  constructor() { super('GameOver'); }
+  init(data) { this.finalScore = data.score || 0; }
+
+  create() {
+    const { WIDTH, HEIGHT, PALETTE } = CONFIG;
+    this.cameras.main.setBackgroundColor(PALETTE.bg);
+    this.cameras.main.fadeIn(400, 0, 0, 0);
+
+    if (!this.registry.get('best') || this.finalScore > this.registry.get('best')) {
+      this.registry.set('best', this.finalScore);
+    }
+    const best = this.registry.get('best');
+
+    this.add.text(WIDTH / 2, HEIGHT * 0.36, 'lost to the dark', {
+      fontFamily: 'Georgia, serif', fontSize: '30px', color: '#6a6a82'
+    }).setOrigin(0.5);
+
+    this.add.text(WIDTH / 2, HEIGHT * 0.47, this.finalScore.toString(), {
+      fontFamily: 'Georgia, serif', fontSize: '72px', color: '#ff9d3c'
+    }).setOrigin(0.5);
+
+    this.add.text(WIDTH / 2, HEIGHT * 0.55, 'best  ' + best, {
+      fontFamily: '-apple-system, sans-serif', fontSize: '18px', color: '#8a8aa0'
+    }).setOrigin(0.5);
+
+    const again = this.add.text(WIDTH / 2, HEIGHT * 0.68, 'tap to descend again', {
+      fontFamily: '-apple-system, sans-serif', fontSize: '18px', color: '#d8d6e0'
+    }).setOrigin(0.5);
+    this.tweens.add({ targets: again, alpha: 0.4, duration: 900,
+      yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+
+    this.input.once('pointerdown', () => {
+      this.cameras.main.fadeOut(400, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Play'));
+    });
+  }
+}
+
+/* ---------------- Game bootstrap ---------------- */
+const game = new Phaser.Game({
+  type: Phaser.AUTO,
+  parent: 'game-root',
+  width: CONFIG.WIDTH,
+  height: CONFIG.HEIGHT,
+  backgroundColor: CONFIG.PALETTE.bg,
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
+  physics: {
+    default: 'arcade',
+    arcade: { gravity: { y: 0 }, debug: false }
+  },
+  scene: [MenuScene, PlayScene, GameOverScene]
+});
+</script>
+</body>
+</html>
