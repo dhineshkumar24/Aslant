@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { CONFIG } from '../config.js';
+import { audio } from '../audio.js';
 import { getGameSafeAreaInsets, lerpFactor } from '../safeArea.js';
 
 export class PlayScene extends Phaser.Scene {
@@ -23,6 +24,8 @@ export class PlayScene extends Phaser.Scene {
     this.addVignette();
 
     this.safeArea = getGameSafeAreaInsets(this);
+
+    audio.startDrone();
 
     this.player = this.add.container(WIDTH / 2, HEIGHT / 2);
     const glow = this.add.circle(0, 0, 26, PALETTE.playerGlow, 0.18);
@@ -304,9 +307,16 @@ export class PlayScene extends Phaser.Scene {
     });
   }
 
+  shutdown() {
+    audio.stopDrone();
+  }
+
   hitHazard() {
     if (!this.isAlive) return;
     this.isAlive = false;
+
+    audio.playHit();
+    audio.stopDrone();
 
     this.cameras.main.flash(200, 255, 157, 60);
     this.cameras.main.shake(250, 0.012);

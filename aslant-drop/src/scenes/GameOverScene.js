@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { CONFIG } from '../config.js';
+import { audio } from '../audio.js';
 import { getGameSafeAreaInsets } from '../safeArea.js';
 import { updateBestScore } from '../storage.js';
 
@@ -62,6 +63,7 @@ export class GameOverScene extends Phaser.Scene {
     });
 
     this.input.once('pointerdown', () => {
+      audio.unlock();
       this.cameras.main.fadeOut(400, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Play'));
     });

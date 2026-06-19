@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { CONFIG } from '../config.js';
+import { audio } from '../audio.js';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -62,6 +63,7 @@ export class MenuScene extends Phaser.Scene {
     });
 
     this.input.once('pointerdown', () => {
+      audio.unlock();
       this.cameras.main.fadeOut(500, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Play'));
     });

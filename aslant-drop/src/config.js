@@ -15,6 +15,13 @@ export const CONFIG = {
   DIFFICULTY_SCORE_STEP: 5,
   AMBIENT_SPECK_COUNT: 60,
   FOG_WISP_COUNT: 14,
+  AUDIO: {
+    MASTER_VOLUME: 0.4,
+    DRONE_VOLUME: 0.14,
+    DRONE_FILTER_HZ: 160,
+    HIT_VOLUME: 0.22,
+    HIT_DURATION: 0.35,
+  },
   PALETTE: {
     bg: 0x0a0a0f,
     fog: 0x12121c,
