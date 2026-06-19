@@ -101,15 +101,39 @@ Paste that URL into App Store Connect → App Privacy → Privacy Policy URL.
 
 ## Step 3 — Screenshots
 
-Apple requires screenshots for **6.7"** (iPhone 15 Pro Max) at minimum. Easiest approach:
+Apple requires screenshots for **6.5" Display** (iPhone 11 Pro Max / XS Max class) at **exact** pixel sizes:
 
-1. Run the app on your iPhone
-2. Take screenshots during menu, gameplay (mid-score), and game over
-3. Upload in App Store Connect → your app → **App Store** tab → **Screenshots**
+| Orientation | Accepted sizes |
+|---|---|
+| Portrait | **1284 × 2778** or **1242 × 2688** |
+| Landscape | 2778 × 1284 or 2688 × 1242 |
 
-Tip: use **Window → Organizer** in Xcode or the iOS screenshot shortcut. You need at least 3 screenshots; 5–8 is better.
+iPhone screenshots taken via AirDrop or chat are often downscaled (~472 × 1024) and will be **rejected**.
+
+### Ready-to-upload screenshots
+
+Pre-sized screenshots live in:
+
+```
+aslant-drop/app-store-screenshots/
+├── 01-menu.png
+├── 02-gameplay-score-30.png
+├── 03-gameplay-score-53.png
+├── 04-gameplay-score-64.png
+└── 05-gameplay-score-81.png
+```
+
+All are **1284 × 2778** portrait PNGs. Upload these to App Store Connect → **iPhone 6.5" Display**.
+
+### Capture at full resolution next time
+
+1. Take screenshots on iPhone (**Side button + Volume Up**)
+2. **AirDrop** or sync via **Photos** — avoid WhatsApp/iMessage (they compress)
+3. On Mac, confirm size in Preview → Tools → Show Inspector (should be ~1284×2778 or similar)
 
 Optional: Xcode Simulator → **File → New Screen Shot** for exact pixel sizes.
+
+Tip: use **Window → Organizer** in Xcode or the iOS screenshot shortcut. You need at least 3 screenshots; 5 is better.
 
 ## Step 4 — Build and upload from Xcode
 
