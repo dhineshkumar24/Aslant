@@ -80,13 +80,24 @@ Complete the questionnaire. Expected result: **4+** (no realistic violence, no u
 
 ## Step 2 — Privacy policy
 
-Host the file at `docs/privacy-policy.html` at a public URL.
+Host the file at `docs/privacy-policy.html` at a public URL (see **GitHub Pages** section below).
 
 Quick options:
-- Push to GitHub and enable **GitHub Pages** for the repo
-- Drop the file on any static host (Vercel, Netlify, personal site)
+- **GitHub Pages** on this repo (recommended) → `https://dhineshkumar24.github.io/Aslant/privacy-policy.html`
+- Vercel / Netlify drop deploy
 
 Paste that URL into App Store Connect → App Privacy → Privacy Policy URL.
+
+### GitHub Pages setup
+
+1. Push the repo-root `docs/` folder to `master` on GitHub
+2. Repo → **Settings** → **Pages**
+3. **Build and deployment** → Source: **Deploy from a branch**
+4. Branch: **master** → Folder: **/docs** → **Save**
+5. Wait 1–2 minutes; GitHub shows the live URL at the top of the Pages settings page
+6. Verify: open `https://dhineshkumar24.github.io/Aslant/privacy-policy.html`
+
+**Important:** App Store requires a **publicly accessible** URL. On GitHub Free, Pages works for **public** repos. Your `Aslant` repo is currently **private** — either make the repo public (Settings → Danger zone → Change visibility) or use GitHub Pro to publish Pages from a private repo.
 
 ## Step 3 — Screenshots
 
