@@ -13,7 +13,8 @@
     "cap:copy": "npx cap copy",
     "cap:ios": "npx cap open ios",
     "cap:android": "npx cap open android",
-    "assets:generate": "node scripts/generate-brand-assets.mjs && npx capacitor-assets generate --iconBackgroundColor '#0a0a0f' --splashBackgroundColor '#0a0a0f'"
+    "assets:generate": "node scripts/generate-brand-assets.mjs && npx capacitor-assets generate --iconBackgroundColor '#0a0a0f' --splashBackgroundColor '#0a0a0f'",
+    "android:bundle": "npm run cap:sync:android && cd android && ./gradlew bundleRelease"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
