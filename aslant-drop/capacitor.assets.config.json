@@ -1,0 +1,15 @@
+{
+  "iconBackgroundColor": "#0a0a0f",
+  "iconBackgroundColorDark": "#0a0a0f",
+  "splashBackgroundColor": "#0a0a0f",
+  "splashBackgroundColorDark": "#0a0a0f",
+  "logoSplashScale": 0.35,
+  "ios": {
+    "icon": "assets/icon-only.png",
+    "splash": "assets/splash.png"
+  },
+  "android": {
+    "icon": "assets/icon-only.png",
+    "splash": "assets/splash.png"
+  }
+}

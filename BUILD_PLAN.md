@@ -100,11 +100,13 @@ Ship the small thing. Then grow it.
 
 ## Definition of Done (v1)
 
-- [ ] Playable start → play → game over loop
-- [ ] Smooth movement, fair collisions, rising difficulty
-- [ ] Dark atmospheric look + sound
-- [ ] Running as a native app on your own iPhone
-- [ ] A friend can pick it up and "get it" in five seconds
+- [x] Playable start → play → game over loop
+- [x] Smooth movement, fair collisions, rising difficulty
+- [x] Dark atmospheric look + sound
+- [x] Running as a native app on your own iPhone
+- [x] Submitted to the App Store (waiting for review)
+- [ ] A friend can pick it up and "get it" in five seconds (post-launch playtest)
+- [ ] Android build verified on device
 
 ---
 
